@@ -1,0 +1,69 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Trailfit – invite</title><style>
+:root{color-scheme:dark}body{margin:0;background:#1B2006;color:#FBFAED;font:16px/1.6 -apple-system,Roboto,Arial,sans-serif}
+main{max-width:520px;margin:0 auto;padding:40px 20px 64px;text-align:center}h1{font-size:26px;line-height:1.25;margin:16px 0 6px}
+p{color:#d9dcc8;margin:8px 0}.muted{color:#8E9870;font-size:14px}a{color:#FFC800}
+.code{display:inline-block;margin:18px 0 6px;padding:10px 18px;border:1.5px dashed #FFC800;border-radius:14px;font:800 26px/1.2 ui-monospace,Menlo,monospace;letter-spacing:4px;color:#FFC800}
+.btn{display:block;margin:12px auto 0;max-width:340px;padding:14px 18px;border-radius:26px;font-weight:800;text-decoration:none}
+.primary{background:#FFC800;color:#1B2006}.secondary{border:1.5px solid #FFC800;color:#FFC800}
+.card{background:#222A0B;border:1px solid #3A4417;border-radius:16px;padding:14px 18px;margin:24px 0 0;text-align:left}
+.logo{display:inline-flex;align-items:center;gap:8px;font-weight:900;letter-spacing:3px;color:#FBFAED}
+</style></head><body><main>
+<div class="logo"><svg width="30" height="25" viewBox="84 122 328 270"><rect x="262" y="140" width="58" height="250" rx="10" fill="#FBFAED"/><rect x="262" y="140" width="150" height="56" rx="10" fill="#FBFAED"/><rect x="262" y="240" width="124" height="52" rx="10" fill="#FBFAED"/><rect x="84" y="122" width="250" height="74" rx="14" fill="#202708"/><rect x="92" y="130" width="234" height="58" rx="10" fill="#FFC800"/><rect x="170" y="130" width="58" height="262" rx="10" fill="#FFC800"/></svg>TRAILFIT</div>
+<h1 id="title"></h1>
+<p id="lead"></p>
+<div class="code" id="code" hidden></div>
+<a class="btn primary" id="open" href="#"></a>
+<a class="btn secondary" id="store" href="#"></a>
+<div class="card"><p id="manual"></p></div>
+<p class="muted" id="bad" hidden></p>
+</main>
+<script>
+(function () {
+  var pl = (navigator.language || '').toLowerCase().indexOf('pl') === 0;
+  var t = pl ? {
+    title: 'Znajomy zaprasza Cię do Trailfit',
+    lead: 'Dołącz do tabeli znajomych i rywalizujcie co miesiąc.',
+    open: 'Otwórz w aplikacji Trailfit',
+    store: 'Pobierz Trailfit z Google Play',
+    manual: 'Masz już aplikację, a przycisk nie działa? Otwórz <b>Ranking → Znajomi → Mam kod</b> i wpisz kod z tej strony.',
+    bad: 'Ten link nie zawiera poprawnego kodu zaproszenia. Poproś znajomego o nowy link.'
+  } : {
+    title: 'A friend invites you to Trailfit',
+    lead: 'Join the friends table and compete every month.',
+    open: 'Open in the Trailfit app',
+    store: 'Get Trailfit on Google Play',
+    manual: 'Already have the app and the button doesn\'t work? Open <b>Ranking → Friends → I have a code</b> and enter the code from this page.',
+    bad: 'This link doesn\'t contain a valid invite code. Ask your friend for a new link.'
+  };
+  document.documentElement.lang = pl ? 'pl' : 'en';
+  var pkg = 'com.trailfit.skupien';
+  var raw = (new URLSearchParams(location.search).get('c') || '').toUpperCase().replace(/[\s-]/g, '');
+  // Ten sam alfabet i długość co FriendRules na serwerze.
+  var code = /^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{8}$/.test(raw) ? raw : null;
+  var store = 'https://play.google.com/store/apps/details?id=' + pkg +
+    (code ? '&referrer=' + encodeURIComponent('invite=' + code) : '');
+  document.getElementById('title').textContent = t.title;
+  document.getElementById('lead').textContent = t.lead;
+  document.getElementById('manual').innerHTML = t.manual;
+  var open = document.getElementById('open');
+  var storeLink = document.getElementById('store');
+  storeLink.textContent = t.store;
+  storeLink.href = store;
+  if (code) {
+    var codeBox = document.getElementById('code');
+    codeBox.textContent = code;
+    codeBox.hidden = false;
+    open.textContent = t.open;
+    // Zainstalowana aplikacja otwiera się z kodem; bez niej Android przechodzi do Google Play (z kodem w referrerze).
+    open.href = 'intent://invite/' + code + '#Intent;scheme=trailfit;package=' + pkg +
+      ';S.browser_fallback_url=' + encodeURIComponent(store) + ';end';
+  } else {
+    open.hidden = true;
+    var bad = document.getElementById('bad');
+    bad.textContent = t.bad;
+    bad.hidden = false;
+  }
+  document.title = 'Trailfit – ' + (pl ? 'zaproszenie' : 'invite');
+})();
+</script>
+</body></html>
